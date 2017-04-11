@@ -64,17 +64,22 @@ search(Name, Pattern) ->
     ExtraArgs = [{search, self(), Pattern}],
     _Set = rpc:pmap(FuncSpec, ExtraArgs, Workers),
     % simple receive to collect results ;-)
+    collector(length(Workers), 1, self()).
+
+%% INTERNAL
+
+collector(Max, Counter, CallePid) ->
     receive
-        {{found, Found}, Pid} ->
+        {{found, Found}, Pid}        ->
             % Found is a {{StartPos, Len}, Worker} of the
             % match, where Worker is the pid of the gen_server
             % controlling the chunk, just make whatever you want!
-            {{found, Found}, Pid}    
-    after 3000 ->
-        timeout
+            {ok, Found, Pid};
+        nomatch when Max > Counter   ->
+            collector(Max, Counter+1, CallePid);
+        nomatch                      ->
+            {error, notfound}
     end.
-
-%% INTERNAL
 
 chunks(<<>>, _)          -> [];
 chunks(Binary, ByteSize) ->
