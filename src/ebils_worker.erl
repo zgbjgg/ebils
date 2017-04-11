@@ -19,8 +19,9 @@ start_link(Id, Chunk) ->
 init([Chunk]) ->
     {ok, #state{chunk = Chunk}}.
 
-handle_call(_Msg, _From, State) ->
-    {reply, 'unkown', State}.
+handle_call({get, {found, {Pos, Len}}, XtraLen}, _From, State=#state{chunk = Chunk}) ->
+    Binary = binary:part(Chunk, Pos, Len + XtraLen),
+    {reply, {ok, Binary}, State}.
 
 handle_cast({search, Pid, Binary}, State=#state{chunk = Chunk}) ->
     % proceed to search in our chunk of data and delivery response
