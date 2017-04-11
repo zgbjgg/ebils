@@ -4,7 +4,9 @@
     load/3,
     load/4,
     search/1,
-    search/2]).
+    search/2,
+    unload/0,
+    unload/1]).
 
 -define(DEFAULT_WORKERS, 100).
 -define(DEFAULT_NAME, ebils).
@@ -42,6 +44,16 @@ load(Name, Binary, Pattern, Workers) ->
             ets:new(Name, [public, named_table]),
             ets:insert(Name, {Name, W})
     end.
+
+unload() ->
+    unload(?DEFAULT_NAME).
+
+unload(Name) ->
+    [{Name, Store}] = ets:tab2list(Name),
+    true = ets:delete(Name),
+    lists:foreach(fun(Pid) ->
+        gen_server:stop(Pid)
+    end, Store).
 
 search(Pattern) ->
     search(?DEFAULT_NAME, Pattern).
