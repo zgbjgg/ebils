@@ -1,0 +1,12 @@
+{application, ebils,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { ebils_app, []}},
+  {env, []}
+ ]}.
