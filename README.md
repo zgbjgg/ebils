@@ -18,8 +18,12 @@ A single example:
  <0.74.0>,<0.75.0>,<0.76.0>,<0.77.0>,<0.78.0>,<0.79.0>,
  <0.80.0>,<0.81.0>,<0.82.0>,<0.83.0>,<0.84.0>,<0.85.0>,
  <0.86.0>,<0.87.0>,<0.88.0>,<0.89.0>,<0.90.0>|...]
-4> timer:tc(ebils, search, [W, <<"ZAZAZAZAZA">>]).
+4> timer:tc(ebils, search, [W, <<"ZbZbZbZbZb">>]).
 {4031,{{found,{2341677,13}},<0.161.0>}}
+5> {Found, Pid} = ebils:search(W, <<"ZbZbZbZbZb">>).
+{{found,{2341677,13}},<0.160.0>}
+6> gen_server:call(Pid, {get, Found, 4}).
+{ok,<<"CUAO960306KE8|0|0">>}
 ```
 In the example:
 
@@ -27,4 +31,6 @@ In the example:
 * Line 2: Check the byte size ( it's very large :-D )
 * Line 3: Parse file into chunks and load into memory
 * Line 4: Perform a single search, the result is the position of the match
+* Line 5: Perform a search and store result in a var to use after
+* Line 6: Extract a binary part of the chunk where found the match
 
