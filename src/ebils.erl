@@ -1,15 +1,20 @@
 -module(ebils).
 
--export([load/2, search/2]).
+-export([load/2,
+    load/3,
+    search/2]).
 
--define(WORKERS, 100).
+-define(DEFAULT_WORKERS, 100).
 
 load(Binary, Pattern) ->
+    load(Binary, Pattern, ?DEFAULT_WORKERS).
+
+load(Binary, Pattern, Workers) ->
     % split the binary in chunks of size
     % but resize when found some delimiter in it so
     % searching in chunks will return correctly data
     Size = byte_size(Binary),
-    ByteSize = Size div ?WORKERS,
+    ByteSize = Size div Workers,
     Chunks = chunks(Binary, ByteSize),
     % resize by delimiter
     ChunksResized = resize(Chunks, Pattern),
