@@ -2,14 +2,20 @@
 
 -export([load/2,
     load/3,
+    load/4,
+    search/1,
     search/2]).
 
 -define(DEFAULT_WORKERS, 100).
+-define(DEFAULT_NAME, ebils).
 
 load(Binary, Pattern) ->
-    load(Binary, Pattern, ?DEFAULT_WORKERS).
+    load(?DEFAULT_NAME, Binary, Pattern, ?DEFAULT_WORKERS).
 
-load(Binary, Pattern, Workers) ->
+load(Name, Binary, Pattern) ->
+    load(Name, Binary, Pattern, ?DEFAULT_WORKERS).
+
+load(Name, Binary, Pattern, Workers) ->
     % split the binary in chunks of size
     % but resize when found some delimiter in it so
     % searching in chunks will return correctly data
@@ -19,15 +25,29 @@ load(Binary, Pattern, Workers) ->
     % resize by delimiter
     ChunksResized = resize(Chunks, Pattern),
     % since chunks resized could have more items
-    % than `?WORKERS` just take the length and create
+    % than `WORKERS` just take the length and create
     % the correct workers
-    lists:map(fun(Chunk) ->
+    W = lists:map(fun(Chunk) ->
         Id = base64:encode(crypto:strong_rand_bytes(50)),
         {ok, Pid} = ebils_worker:start_link(binary_to_atom(Id), Chunk),
         Pid
-    end, ChunksResized).
+    end, ChunksResized),
+    % store the workers into a public ets so can be added
+    % more process to the actual one
+    try
+        [{Name, Store}] = ets:tab2list(Name), 
+        ets:insert(Name, {Name, Store ++ W})
+    catch
+        _:_ ->
+            ets:new(Name, [public, named_table]),
+            ets:insert(Name, {Name, W})
+    end.
 
-search(Workers, Pattern) ->
+search(Pattern) ->
+    search(?DEFAULT_NAME, Pattern).
+
+search(Name, Pattern) ->
+    [{Name, Workers}] = ets:tab2list(Name),
     FuncSpec = {gen_server, cast},
     ExtraArgs = [{search, self(), Pattern}],
     _Set = rpc:pmap(FuncSpec, ExtraArgs, Workers),
