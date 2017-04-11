@@ -23,7 +23,7 @@ A single example:
 5> {Found, Pid} = ebils:search(W, <<"ZbZbZbZbZb">>).
 {{found,{2341677,13}},<0.160.0>}
 6> gen_server:call(Pid, {get, Found, 4}).
-{ok,<<"CUAO960306KE8|0|0">>}
+{ok,<<"ZbZbZbZbZb|J|89">>}
 ```
 In the example:
 
