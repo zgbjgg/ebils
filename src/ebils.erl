@@ -64,7 +64,14 @@ search(Name, Pattern) ->
     ExtraArgs = [{search, self(), Pattern}],
     _Set = rpc:pmap(FuncSpec, ExtraArgs, Workers),
     % simple receive to collect results ;-)
-    collector(length(Workers), 1, self()).
+    Self = self(),
+    Pid = spawn(fun() ->
+        receive
+            Result ->
+                Self ! Result
+        end
+    end),
+    collector(length(Workers), 1, Pid).
 
 %% INTERNAL
 
@@ -76,7 +83,7 @@ collector(Max, Counter, CallePid) ->
             % controlling the chunk, just make whatever you want!
             {ok, Found, Pid};
         nomatch when Max > Counter   ->
-            collector(Max, Counter+1, CallePid);
+            collector(Max, Counter, CallePid);
         nomatch                      ->
             {error, notfound}
     end.
