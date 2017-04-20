@@ -11,12 +11,19 @@
 -define(DEFAULT_WORKERS, 100).
 -define(DEFAULT_NAME, ebils).
 
+-type found() :: {ok, {non_neg_integer(), non_neg_integer()}, pid()}.
+-type notfound() :: {error, notfound}. 
+
+-spec load(Binary :: binary(), Pattern :: binary()) -> true.
 load(Binary, Pattern) ->
     load(?DEFAULT_NAME, Binary, Pattern, ?DEFAULT_WORKERS).
 
+-spec load(Name :: atom(), Binary :: binary(), Pattern :: binary()) -> true.
 load(Name, Binary, Pattern) ->
     load(Name, Binary, Pattern, ?DEFAULT_WORKERS).
 
+-spec load(Name :: atom(), Binary :: binary(), Pattern :: binary(),
+    Workers :: non_neg_integer()) -> true.
 load(Name, Binary, Pattern, Workers) ->
     % split the binary in chunks of size
     % but resize when found some delimiter in it so
@@ -45,9 +52,11 @@ load(Name, Binary, Pattern, Workers) ->
             ets:insert(Name, {Name, W})
     end.
 
+-spec unload() -> ok.
 unload() ->
     unload(?DEFAULT_NAME).
 
+-spec unload(Name :: atom()) -> ok.
 unload(Name) ->
     [{Name, Store}] = ets:tab2list(Name),
     true = ets:delete(Name),
@@ -55,9 +64,11 @@ unload(Name) ->
         gen_server:stop(Pid)
     end, Store).
 
+-spec search(Pattern :: binary()) -> notfound() | found(). 
 search(Pattern) ->
     search(?DEFAULT_NAME, Pattern).
 
+-spec search(Name :: atom(), Pattern :: binary()) -> notfound() | found().
 search(Name, Pattern) ->
     [{Name, Workers}] = ets:tab2list(Name),
     FuncSpec = {gen_server, cast},
@@ -75,11 +86,13 @@ search(Name, Pattern) ->
 
 %% INTERNAL
 
+-spec collector(Max :: non_neg_integer(), Counter :: non_neg_integer(),
+    CallePid :: pid()) -> notfound() | found(). 
 collector(Max, Counter, CallePid) ->
     receive
         {{found, Found}, Pid}        ->
-            % Found is a {{StartPos, Len}, Worker} of the
-            % match, where Worker is the pid of the gen_server
+            % Found is a {StartPos, Len} of the
+            % match, where Pid is the worker (gen_server)
             % controlling the chunk, just make whatever you want!
             {ok, Found, Pid};
         nomatch when Max > Counter   ->
@@ -88,6 +101,7 @@ collector(Max, Counter, CallePid) ->
             {error, notfound}
     end.
 
+-spec chunks(Binary :: binary(), ByteSize :: non_neg_integer()) -> [ binary() ].
 chunks(<<>>, _)          -> [];
 chunks(Binary, ByteSize) ->
     case byte_size(Binary)>ByteSize of
@@ -98,6 +112,7 @@ chunks(Binary, ByteSize) ->
             [ Binary | chunks(<<>>, ByteSize) ]
     end.
 
+-spec resize(Chunks :: [ binary() ], Pattern :: binary()) -> [ binary() ].
 resize([], _Pattern)              -> [];
 resize([Chunk | [] ], _Pattern)   -> [Chunk];
 resize([Chunk | Chunks], Pattern) ->
@@ -120,6 +135,7 @@ resize([Chunk | Chunks], Pattern) ->
             [ NewChunk | resize([NewChunk0 | Chunks0], Pattern) ]
     end.
 
+-spec binary_to_atom(Bin :: binary()) -> atom().
 binary_to_atom(Bin) ->
     L = binary_to_list(Bin),
     list_to_atom(L).
