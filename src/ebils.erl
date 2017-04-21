@@ -96,7 +96,7 @@ collector(Max, Counter, CallePid) ->
             % controlling the chunk, just make whatever you want!
             {ok, Found, Pid};
         nomatch when Max > Counter   ->
-            collector(Max, Counter, CallePid);
+            collector(Max, Counter+1, CallePid);
         nomatch                      ->
             {error, notfound}
     end.
