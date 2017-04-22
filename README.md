@@ -1,6 +1,8 @@
 # ebils
 EBILS - Erlang Binary Lightweight Search
 
+[![Build Status](https://travis-ci.org/zgbjgg/ebils.svg?branch=master)](https://travis-ci.org/zgbjgg/ebils)
+
 A single binary search for large and huge binary into pure erlang, this uses small chunk of binaries to search in them using single processes and delivering message to the main process.
 
 With single tests of a large binary this method can be 17x faster that single `binary:match` and allows to you seek results in the process.
