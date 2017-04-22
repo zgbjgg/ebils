@@ -1,5 +1,5 @@
 language: erlang
-script: "mkdir log && mkdir log/ct && ./rebar compile && ./rebar ct"
+script: "make && make test"
 otp_release:
 - 19.2
 - 19.1
