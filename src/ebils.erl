@@ -71,18 +71,16 @@ search(Pattern) ->
 -spec search(Name :: atom(), Pattern :: binary()) -> notfound() | found().
 search(Name, Pattern) ->
     [{Name, Workers}] = ets:tab2list(Name),
+    % create a spawn for the collector
+    Self = self(),
+    Pid = spawn(fun() -> collector(length(Workers), 1, Self) end),
     FuncSpec = {gen_server, cast},
-    ExtraArgs = [{search, self(), Pattern}],
+    ExtraArgs = [{search, Pid, Pattern}],
     _Set = rpc:pmap(FuncSpec, ExtraArgs, Workers),
     % simple receive to collect results ;-)
-    Self = self(),
-    Pid = spawn(fun() ->
-        receive
-            Result ->
-                Self ! Result
-        end
-    end),
-    collector(length(Workers), 1, Pid).
+    receive
+        Result -> Result
+    end.
 
 %% INTERNAL
 
@@ -94,11 +92,11 @@ collector(Max, Counter, CallePid) ->
             % Found is a {StartPos, Len} of the
             % match, where Pid is the worker (gen_server)
             % controlling the chunk, just make whatever you want!
-            {ok, Found, Pid};
+            CallePid ! {ok, Found, Pid};
         nomatch when Max > Counter   ->
             collector(Max, Counter+1, CallePid);
         nomatch                      ->
-            {error, notfound}
+            CallePid ! {error, notfound}
     end.
 
 -spec chunks(Binary :: binary(), ByteSize :: non_neg_integer()) -> [ binary() ].
