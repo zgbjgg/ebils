@@ -20,7 +20,7 @@ true
 {4031,{{ok,{2341677,13},<0.161.0>}}
 5> {Found, Pid} = ebils:search(<<"ZbZbZbZbZb">>).
 {ok,{2341677,13},<0.160.0>}
-6> gen_server:call(Pid, {get, Found, 4}).
+6> gen_server:call(Pid, {get, {found, Found}, 4}).
 {ok,<<"ZbZbZbZbZb|J|89">>}
 ```
 In the example:
@@ -31,4 +31,3 @@ In the example:
 * Line 4: Perform a single search, the result is the position of the match
 * Line 5: Perform a search and store result in a var to use after
 * Line 6: Extract a binary part of the chunk where found the match
-
