@@ -2,6 +2,7 @@
 EBILS - Erlang Binary Lightweight Search
 
 [![Build Status](https://travis-ci.org/zgbjgg/ebils.svg?branch=master)](https://travis-ci.org/zgbjgg/ebils)
+[![License: MIT](https://img.shields.io/github/license/zgbjgg/ebils.svg)](https://raw.githubusercontent.com/zgbjgg/ebils/master/LICENSE)
 
 A single binary search for large and huge binary into pure erlang, this uses small chunk of binaries to search in them using single processes and delivering message to the main process.
 
