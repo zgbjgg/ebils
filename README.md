@@ -32,3 +32,38 @@ In the example:
 * Line 4: Perform a single search, the result is the position of the match
 * Line 5: Perform a search and store result in a var to use after
 * Line 6: Extract a binary part of the chunk where found the match
+
+## API
+
+Load a binary into the system to use after for seeking matches, you can specify the name for the workers,
+the length of workers created to process the binary and the pattern to split the chunks.
+
+### ebils:load/2 ###
+
+`ebils:load(Binary::binary(), Pattern::binary()) -> true`
+
+### ebils:load/3 ###
+
+`ebils:load(Name::atom(), Binary::binary(), Pattern::binary()) -> true`
+
+### ebils:load/4 ###
+
+`ebils:load(Name::atom(), Binary::binary(), Pattern::binary(), Workers::non_neg_integer()) -> true`
+
+Search a single binary into the preloaded binary, you can specify the binary to seek and the name for the workers,
+(default name to ebils, used with ebils:search/1)
+
+### ebils:search/1 ###
+
+`ebils:search(Binary::binary()) -> {ok, {non_neg_integer(), non_neg_integer()}, pid()}`
+
+### ebils:search/2 ###
+
+`ebils:search(Name::atom(), Binary()) -> {ok, {non_neg_integer(), non_neg_integer()}, pid()}`
+
+Get the data from the process where the binary was found. Use a simple gen_server call using the pid where found 
+the data and the tuple of Found data, also you should provide a third parameter containing the size of data to retrieve.
+
+### gen_server:call/2 ###
+
+`gen_server:call(pid(), {get, {found, {non_neg_integer(), non_neg_integer()}, integer()} -> {ok, binary()}`
