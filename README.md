@@ -67,3 +67,14 @@ the data and the tuple of Found data, also you should provide a third parameter 
 ### gen_server:call/2 ###
 
 `gen_server:call(pid(), {get, {found, {non_neg_integer(), non_neg_integer()}, integer()} -> {ok, binary()}`
+
+Unload all data kept in processes and kill the processes, you can specify the name for the workers, this method will be helpful
+to re-run the data (if binary changes)
+
+### ebils:unload/0 ###
+
+`ebils:unload() -> ok`
+
+### ebils:unload/1 ###
+
+`ebils:unload(Name::atom()) -> ok`
