@@ -10,7 +10,8 @@
     test_search_success/1,
     test_get_from_search/1,
     test_append_load_runtime/1,
-    test_unload/1]).
+    test_unload/1,
+    test_reload/1]).
 
 -define(KEY_SIZE, 20).
 -define(PIECE_LAST, "|0|0").
@@ -23,7 +24,8 @@ all() ->
      test_search_success,
      test_get_from_search,
      test_append_load_runtime,
-     test_unload].
+     test_unload,
+     test_reload].
 
 test_load_default([{big_ben, BigBen}]) ->
     Loaded = ebils:load(BigBen, <<"\n">>),
@@ -62,6 +64,13 @@ test_unload([{big_ben, BigBen}]) ->
     true = ebils:load(BigBen, <<"\n">>),
     ok = ebils:unload(),
     ?assertEqual(undefined, ets:info(ebils)).
+
+test_reload([{big_ben, BigBen}]) ->
+    true = ebils:load(BigBen, <<"\n">>),
+    {ok, Found, Pid} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
+    ok = ebils:reload(BigBen, <<"\n">>),
+    {ok, Found, Pid1} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
+    ?assertEqual({225,20}, Found).
 
 init_per_testcase(_, _Config) ->
     % create a huge binary
