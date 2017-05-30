@@ -6,7 +6,10 @@
     search/1,
     search/2,
     unload/0,
-    unload/1]).
+    unload/1,
+    reload/2,
+    reload/3,
+    reload/4]).
 
 -define(DEFAULT_WORKERS, 100).
 -define(DEFAULT_NAME, ebils).
@@ -51,6 +54,49 @@ load(Name, Binary, Pattern, Workers) ->
             ets:new(Name, [public, named_table]),
             ets:insert(Name, {Name, W})
     end.
+
+-spec reload(Binary :: binary(), Pattern :: binary()) -> ok.
+reload(Binary, Pattern) ->
+    reload(?DEFAULT_NAME, Binary, Pattern, ?DEFAULT_WORKERS).
+
+-spec reload(Name :: atom(), Binary :: binary(), Pattern :: binary()) -> ok.
+reload(Name, Binary, Pattern) ->
+    reload(Name, Binary, Pattern, ?DEFAULT_WORKERS).
+
+-spec reload(Name :: atom(), Binary :: binary(), Pattern :: binary(),
+    Workers :: non_neg_integer()) -> ok.
+reload(Name, Binary, Pattern, Workers) ->
+    % split the binary in chunks of size
+    % but resize when found some delimiter in it so
+    % searching in chunks will return correctly data
+    Size = byte_size(Binary),
+    ByteSize = Size div Workers,
+    Chunks = chunks(Binary, ByteSize),
+    % resize by delimiter
+    ChunksResized = resize(Chunks, Pattern),
+    % since chunks resized could have more items
+    % than `WORKERS` just take the length and create
+    % the correct workers
+    W = lists:map(fun(Chunk) ->
+        Id = base64:encode(crypto:strong_rand_bytes(50)),
+        {ok, Pid} = ebils_worker:start_link(binary_to_atom(Id), Chunk),
+        Pid
+    end, ChunksResized),
+    % get the old workers to remove after adding new processes
+    [{_NameOld, StoreOld}] = ets:tab2list(Name),
+    % store the workers into a public ets so can be added
+    % more process to the actual one
+    try
+        [{Name, _Store}] = ets:tab2list(Name),
+        ets:insert(Name, {Name, W})
+    catch
+        _:_ ->
+            ets:new(Name, [public, named_table]),
+            ets:insert(Name, {Name, W})
+    end,
+    lists:foreach(fun(Pid) ->
+        gen_server:stop(Pid)
+    end, StoreOld).
 
 -spec unload() -> ok.
 unload() ->
