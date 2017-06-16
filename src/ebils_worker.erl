@@ -20,7 +20,16 @@ init([Chunk]) ->
     {ok, #state{chunk = Chunk}}.
 
 handle_call({get, {found, {Pos, Len}}, XtraLen}, _From, State=#state{chunk = Chunk}) ->
-    Binary = binary:part(Chunk, Pos, Len + XtraLen),
+    % check if position is > than length of chunk, return only until eof
+    MaybeLength = Pos + Len + XtraLen,
+    XtraLen0 = case byte_size(Chunk)<MaybeLength of
+        true ->
+            Offset = MaybeLength - byte_size(Chunk),
+            XtraLen - Offset;
+        false ->
+            XtraLen
+    end,
+    Binary = binary:part(Chunk, Pos, Len + XtraLen0),
     {reply, {ok, Binary}, State}.
 
 handle_cast({search, Pid, Binary}, State=#state{chunk = Chunk}) ->
