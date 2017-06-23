@@ -48,7 +48,7 @@ test_search_success([{big_ben, BigBen}]) ->
 test_get_from_search([{big_ben, BigBen}]) ->
     true = ebils:load(BigBen, <<"\n">>),
     {ok, Found, Pid} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
-    {ok, Value} = gen_server:call(Pid, {get, {found, Found}, 4}),
+    {ok, Value} = ebils:fetch(Pid, {get, {found, Found}, 4}),
     ?assertEqual(<<"ZZZZZZZZZZZZZZZZZZZZ|0|0">>, Value).
 
 test_append_load_runtime([{big_ben, BigBen}]) ->
