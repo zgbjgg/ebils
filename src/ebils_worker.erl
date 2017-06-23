@@ -19,7 +19,10 @@ start_link(Id, Chunk) ->
 init([Chunk]) ->
     {ok, #state{chunk = Chunk}}.
 
-handle_call({get, {found, {Pos, Len}}, XtraLen}, _From, State=#state{chunk = Chunk}) ->
+handle_call(_Msg, _From, State) ->
+    {reply, ok, State}.
+
+handle_cast({{get, {found, {Pos, Len}}, XtraLen}, FromPid}, State=#state{chunk = Chunk}) ->
     % check if position is > than length of chunk, return only until eof
     MaybeLength = Pos + Len + XtraLen,
     XtraLen0 = case byte_size(Chunk)<MaybeLength of
@@ -30,8 +33,8 @@ handle_call({get, {found, {Pos, Len}}, XtraLen}, _From, State=#state{chunk = Chu
             XtraLen
     end,
     Binary = binary:part(Chunk, Pos, Len + XtraLen0),
-    {reply, {ok, Binary}, State}.
-
+    FromPid ! Binary,
+    {noreply, State};
 handle_cast({search, Pid, Binary}, State=#state{chunk = Chunk}) ->
     % proceed to search in our chunk of data and delivery response
     % to the `PID` (represents who performs search).

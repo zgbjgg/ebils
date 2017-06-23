@@ -9,7 +9,8 @@
     unload/1,
     reload/2,
     reload/3,
-    reload/4]).
+    reload/4,
+    fetch/2]).
 
 -define(DEFAULT_WORKERS, 100).
 -define(DEFAULT_NAME, ebils).
@@ -126,6 +127,14 @@ search(Name, Pattern) ->
     % simple receive to collect results ;-)
     receive
         Result -> Result
+    end.
+
+fetch(Pid, Found) ->
+    ok = gen_server:cast(Pid, {Found, self()}),
+    receive
+        Binary -> {ok, Binary}
+    after 2000 ->
+        {error, crashing}
     end.
 
 %% INTERNAL
