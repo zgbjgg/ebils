@@ -21,7 +21,7 @@ true
 {4031,{{ok,{2341677,13},<0.161.0>}}
 5> {Found, Pid} = ebils:search(<<"ZbZbZbZbZb">>).
 {ok,{2341677,13},<0.160.0>}
-6> gen_server:call(Pid, {get, {found, Found}, 4}).
+6> ebils:fetch(Pid, {get, {found, Found}, 4}).
 {ok,<<"ZbZbZbZbZb|J|89">>}
 ```
 In the example:
@@ -64,9 +64,9 @@ Search a single binary into the preloaded binary, you can specify the binary to 
 Get the data from the process where the binary was found. Use a simple gen_server call using the pid where found 
 the data and the tuple of Found data, also you should provide a third parameter containing the size of data to retrieve.
 
-### gen_server:call/2 ###
+### ebils:fetch/2 ###
 
-`gen_server:call(pid(), {get, {found, {non_neg_integer(), non_neg_integer()}, integer()} -> {ok, binary()}`
+`ebils:fetch(pid(), {get, {found, {non_neg_integer(), non_neg_integer}}, integer}) -> {ok, binary()}`
 
 Unload all data kept in processes and kill the processes, you can specify the name for the workers, this method will be helpful
 to re-run the data (if binary changes)
@@ -78,3 +78,17 @@ to re-run the data (if binary changes)
 ### ebils:unload/1 ###
 
 `ebils:unload(Name::atom()) -> ok`
+
+Refresh the chunks and the workers (processes) with new binaries in their state
+
+### ebils:reload/2 ###
+
+`ebils:reload(Binary :: binary() | [binary(), ...], Pattern :: binary()) -> ok`
+
+### ebils:reload/3 ###
+
+`ebils:reload(Name :: atom(), Binary :: binary() | [binary(), ...], Pattern :: binary()) -> ok`
+
+### ebils:reload/4 ###
+
+`ebils:reload(Name :: atom(), Binary :: binary() | [binary(), ...], Pattern :: binary(), Workers :: non_neg_integer()) -> ok`
