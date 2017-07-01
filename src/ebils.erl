@@ -56,17 +56,26 @@ load(Name, Binary, Pattern, Workers) ->
             ets:insert(Name, {Name, W})
     end.
 
--spec reload(Binary :: binary(), Pattern :: binary()) -> ok.
-reload(Binary, Pattern) ->
+-spec reload(Binary :: binary() | list(), Pattern :: binary()) -> ok.
+reload(Binary, Pattern) when is_binary(Binary) ->
+    reload(?DEFAULT_NAME, Binary, Pattern, ?DEFAULT_WORKERS);
+reload(Binaries, Pattern) when is_list(Binaries) ->
+    Binary = binary:list_to_bin(Binaries),
     reload(?DEFAULT_NAME, Binary, Pattern, ?DEFAULT_WORKERS).
 
--spec reload(Name :: atom(), Binary :: binary(), Pattern :: binary()) -> ok.
-reload(Name, Binary, Pattern) ->
+-spec reload(Name :: atom(), Binary :: binary() | list(), Pattern :: binary()) -> ok.
+reload(Name, Binary, Pattern) when is_binary(Binary) ->
+    reload(Name, Binary, Pattern, ?DEFAULT_WORKERS);
+reload(Name, Binaries, Pattern) when is_list(Binaries) ->
+    Binary = binary:list_to_bin(Binaries),
     reload(Name, Binary, Pattern, ?DEFAULT_WORKERS).
 
--spec reload(Name :: atom(), Binary :: binary(), Pattern :: binary(),
+-spec reload(Name :: atom(), Binary :: binary() | list(), Pattern :: binary(),
     Workers :: non_neg_integer()) -> ok.
-reload(Name, Binary, Pattern, Workers) ->
+reload(Name, Binaries, Pattern, Workers) when is_list(Binaries) ->
+    Binary = binary:list_to_bin(Binaries),
+    reload(Name, Binary, Pattern, Workers);
+reload(Name, Binary, Pattern, Workers) when is_binary(Binary) ->
     % split the binary in chunks of size
     % but resize when found some delimiter in it so
     % searching in chunks will return correctly data
