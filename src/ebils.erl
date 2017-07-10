@@ -189,12 +189,20 @@ resize([Chunk | Chunks], Pattern) ->
             CPattern = binary:compile_pattern(Pattern),
             Size = byte_size(Chunk0),
             % match pattern
-            {Found, 1} = binary:match(Chunk0, CPattern),
-            Piece = binary:part(Chunk0, {0, Found + 1}),
-            NewChunk = <<Chunk/binary, Piece/binary>>,
-            % resize the chunk 0
-            NewChunk0 = binary:part(Chunk0, {Found + 1, Size - (Found + 1)}),
-            [ NewChunk | resize([NewChunk0 | Chunks0], Pattern) ]
+            case binary:match(Chunk0, CPattern) of
+                {Found, 1} ->
+                    Piece = binary:part(Chunk0, {0, Found + 1}),
+                    NewChunk = <<Chunk/binary, Piece/binary>>,
+                    % resize the chunk 0
+                    NewChunk0 = binary:part(Chunk0, {Found + 1, Size - (Found + 1)}),
+                    [ NewChunk | resize([NewChunk0 | Chunks0], Pattern) ];
+               nomatch     ->
+                 % what happens if next chunk cannot complete previous one, just concat
+                 % the actual chunk with the new one. BE CAREFUL BECAUSE IF YOUR PROVIDED
+                 % BINARY HAS THIS BEHAVIOUR MAYBE THE SEARCHES WILL BE INCONSISTENCE!
+                 NewChunk = <<Chunk/binary, Chunk0/binary>>,
+                 [ NewChunk | resize(Chunks0, Pattern) ]
+           end
     end.
 
 -spec binary_to_atom(Bin :: binary()) -> atom().
