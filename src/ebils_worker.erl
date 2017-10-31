@@ -39,13 +39,10 @@ handle_cast({search, Pid, Binary}, State=#state{chunk = Chunk}) ->
     % proceed to search in our chunk of data and delivery response
     % to the `PID` (represents who performs search).
     
-    % compile the binary
-    Pattern = binary:compile_pattern(Binary),
-
     % search in chunk
-    case binary:match(Chunk, Pattern) of
+    case binary:match(Chunk, [Binary]) of
         nomatch -> 
-            Pid ! nomatch; % propagate error, not found!
+            ok; % dont propagate error, just ignore!
         Found   ->
             % propagate found to the pid performing the action
             Pid ! { {found, Found}, self() }
