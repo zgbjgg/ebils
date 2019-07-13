@@ -67,9 +67,9 @@ test_unload([{big_ben, BigBen}]) ->
 
 test_reload([{big_ben, BigBen}]) ->
     true = ebils:load(BigBen, <<"\n">>),
-    {ok, Found, Pid} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
+    {ok, Found, _Pid} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
     ok = ebils:reload(BigBen, <<"\n">>),
-    {ok, Found, Pid1} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
+    {ok, Found, _Pid1} = ebils:search(<<"ZZZZZZZZZZZZZZZZZZZZ">>),
     ?assertEqual({225,20}, Found).
 
 init_per_testcase(_, _Config) ->
