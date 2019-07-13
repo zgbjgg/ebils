@@ -1,12 +1,14 @@
 {application, ebils,
  [
-  {description, ""},
-  {vsn, "1"},
+  {description, "Erlang Binary Lightweight Search"},
+  {vsn, "0.1.1"},
   {registered, []},
   {applications, [
                   kernel,
                   stdlib
                  ]},
   {mod, { ebils_app, []}},
-  {env, []}
+  {env, []},
+  {licenses, ["MIT"]},
+  {links, [{"Github", "https://github.com/zgbjgg/ebils"}]}
  ]}.
