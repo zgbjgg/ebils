@@ -4,10 +4,10 @@
 all: compile
 
 compile:
-	@./rebar compile
+	@./rebar3 compile
 
 clean:
-	@./rebar clean
+	@./rebar3 clean
 
 test:
-	@mkdir -p log && mkdir -p log/ct && ./rebar ct
+	@mkdir -p log && mkdir -p log/ct && ./rebar3 ct
