@@ -4,6 +4,8 @@ EBILS - Erlang Binary Lightweight Search
 [![Hex.pm](https://img.shields.io/hexpm/v/ebils.svg)](https://hex.pm/packages/ebils)
 [![Build Status](https://travis-ci.org/zgbjgg/ebils.svg?branch=master)](https://travis-ci.org/zgbjgg/ebils)
 [![License: MIT](https://img.shields.io/github/license/zgbjgg/ebils.svg)](https://raw.githubusercontent.com/zgbjgg/ebils/master/LICENSE)
+[![Hex.pm](https://img.shields.io/hexpm/dt/ebils.svg)](https://hex.pm/packages/ebils)
+[![Hex.pm](https://img.shields.io/hexpm/dw/ebils.svg)](https://hex.pm/packages/ebils)
 
 A single binary search for large and huge binary into pure erlang, this uses small chunk of binaries to search in them using single processes and delivering message to the main process.
 
