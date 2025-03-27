@@ -10,4 +10,4 @@ clean:
 	@./rebar3 clean
 
 test:
-	@mkdir -p log && mkdir -p log/ct && ./rebar3 ct
+	@mkdir -p log && mkdir -p log/ct && ./rebar3 ct --readable=false
