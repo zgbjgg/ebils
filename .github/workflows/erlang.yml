@@ -21,6 +21,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Compile
-      run: make
+      run: rebar3 compile
     - name: Run tests
-      run: make test
+      run: rebar3 ct
