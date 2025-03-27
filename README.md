@@ -2,7 +2,7 @@
 EBILS - Erlang Binary Lightweight Search
 
 [![Hex.pm](https://img.shields.io/hexpm/v/ebils.svg)](https://hex.pm/packages/ebils)
-[![Build Status](https://travis-ci.org/zgbjgg/ebils.svg?branch=master)](https://travis-ci.org/zgbjgg/ebils)
+[![Build Status](https://github.com/zgbjgg/ebils/actions/workflows/erlang.yml/badge.svg)](https://github.com/zgbjgg/ebils/actions/workflows/erlang.yml)
 [![License: MIT](https://img.shields.io/github/license/zgbjgg/ebils.svg)](https://raw.githubusercontent.com/zgbjgg/ebils/master/LICENSE)
 [![Hex.pm](https://img.shields.io/hexpm/dt/ebils.svg)](https://hex.pm/packages/ebils)
 [![Hex.pm](https://img.shields.io/hexpm/dw/ebils.svg)](https://hex.pm/packages/ebils)
